@@ -1,11 +1,47 @@
-<script setup></script>
+
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <main>
+    <h1>Items</h1>
+
+    <p v-if="isLoading">Loading items...</p>
+
+    <p v-else-if="errorMessage" role="alert">
+      {{ errorMessage }}
+    </p>
+
+    <p v-else-if="items.length === 0">No items found.</p>
+
+    <table v-else>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Quantity</th>
+          <th>Unit price</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr v-for="item in items" :key="item.id">
+          <td>{{ item.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ Number(item.unitPrice).toFixed(2) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
 </template>
 
-<style scoped></style>
+<script setup>
+import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useItemStore } from "./stores/itemStore.mjs";
+
+const itemStore = useItemStore();
+
+const { items, errorMessage, isLoading } = storeToRefs(itemStore);
+
+onMounted(() => {
+  itemStore.loadItems();
+});
+</script>

@@ -71,3 +71,20 @@ export async function updateItem(req, res, next) {
     return next(error);
   }
 }
+export async function deleteItem(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+
+    const item = await itemModel.deleteItem(id);
+
+    if (!item) {
+      const error = new Error("Item not found.");
+      error.status = 404;
+      return next(error);
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return next(error);
+  }
+}

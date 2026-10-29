@@ -1,9 +1,11 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import { addItem } from "../../controllers/itemController.mjs";
+import { addItem, updateItem } from "../../controllers/itemController.mjs";
 import * as itemModel from "../../models/itemModel.mjs";
 
 vi.mock("../../models/itemModel.mjs", () => ({
   createItem: vi.fn(),
+  updateItem: vi.fn(),
+
 }));
 
 describe("addItem", () => {
@@ -59,6 +61,79 @@ describe("addItem", () => {
     itemModel.createItem.mockRejectedValue(error);
 
     await addItem(req, res, next);
+
+    expect(next).toHaveBeenCalledExactlyOnceWith(error);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateItem", () => {
+  let req;
+  let res;
+  let next;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+
+    req = {
+      params: { id: "1" },
+      body: {
+        name: "Apple",
+        quantity: 5,
+        unitPrice: 2.5,
+      },
+    };
+
+    res = {
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
+    };
+
+    next = vi.fn();
+  });
+
+  it("returns status 200 and the updated item", async () => {
+    const updatedItem = {
+      id: 1,
+      name: "Apple",
+      quantity: "5",
+      unitPrice: "2.50",
+    };
+
+    itemModel.updateItem.mockResolvedValue(updatedItem);
+
+    await updateItem(req, res, next);
+
+    expect(itemModel.updateItem).toHaveBeenCalledExactlyOnceWith(
+      1,
+      req.body
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(updatedItem);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("passes a 404 error to next when the item does not exist", async () => {
+    itemModel.updateItem.mockResolvedValue(null);
+
+    await updateItem(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+
+    const error = next.mock.calls[0][0];
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error.status).toBe(404);
+    expect(res.json).not.toHaveBeenCalled();
+  });
+
+  it("passes a model error to next", async () => {
+    const error = new Error("Database unavailable.");
+
+    itemModel.updateItem.mockRejectedValue(error);
+
+    await updateItem(req, res, next);
 
     expect(next).toHaveBeenCalledExactlyOnceWith(error);
     expect(res.status).not.toHaveBeenCalled();

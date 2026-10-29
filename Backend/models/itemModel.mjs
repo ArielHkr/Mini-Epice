@@ -30,3 +30,17 @@ export async function createItem({ name, quantity, unitPrice }) {
 
   return rows[0];
 }
+
+export async function updateItem(id, { name, quantity, unitPrice }) {
+  const { rows } = await db.query(
+    `UPDATE items
+     SET name = $1,
+         quantity = $2,
+         unit_price = $3
+     WHERE id = $4
+     RETURNING id, name, quantity, unit_price AS "unitPrice"`,
+    [name, quantity, unitPrice, id]
+  );
+
+  return rows[0] ?? null;
+}

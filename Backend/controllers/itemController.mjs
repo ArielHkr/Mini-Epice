@@ -48,3 +48,26 @@ export async function addItem(req, res, next) {
     return next(error);
   }
 }
+
+export async function updateItem(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    const { name, quantity, unitPrice } = req.body;
+
+    const item = await itemModel.updateItem(id, {
+      name,
+      quantity,
+      unitPrice,
+    });
+
+    if (!item) {
+      const error = new Error("Item not found.");
+      error.status = 404;
+      return next(error);
+    }
+
+    return res.status(200).json(item);
+  } catch (error) {
+    return next(error);
+  }
+}

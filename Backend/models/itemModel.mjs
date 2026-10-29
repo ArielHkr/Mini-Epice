@@ -20,3 +20,13 @@ export async function findById(id) {
 
   return rows[0] ?? null;
 }
+export async function createItem({ name, quantity, unitPrice }) {
+  const { rows } = await db.query(
+    `INSERT INTO items (name, quantity, unit_price)
+     VALUES ($1, $2, $3)
+     RETURNING id, name, quantity, unit_price AS "unitPrice"`,
+    [name, quantity, unitPrice]
+  );
+
+  return rows[0];
+}

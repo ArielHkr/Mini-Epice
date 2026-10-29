@@ -33,3 +33,18 @@ export async function getItemById(req, res, next) {
     return next(error);
   }
 }
+export async function addItem(req, res, next) {
+  try {
+    const { name, quantity, unitPrice } = req.body;
+
+    const item = await itemModel.createItem({
+      name,
+      quantity,
+      unitPrice,
+    });
+
+    return res.status(201).json(item);
+  } catch (error) {
+    return next(error);
+  }
+}

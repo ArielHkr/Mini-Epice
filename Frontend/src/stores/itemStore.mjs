@@ -58,8 +58,58 @@ export const useItemStore = defineStore("items", () => {
       isLoading.value = false;
     }
   }
+async function getItemById(id) {
+  const response = await fetch(`${Url}/items/${id}`);
 
-  return {
+  if (response.status === 404) {
+    throw new Error("Item not found.");
+  }
+
+  if (!response.ok) {
+    throw new Error("Unable to retrieve the item.");
+  }
+
+  return response.json();
+}
+
+async function updateItem(id, item) {
+  if (isSaving.value) return false;
+
+  isSaving.value = true;
+  saveError.value = "";
+
+  try {
+    const response = await fetch(`${Url}/items/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to update the item.");
+    }
+
+    const updatedItem = await response.json();
+
+    const index = items.value.findIndex(
+      (item) => item.id === updatedItem.id
+    );
+
+    if (index !== -1) {
+      items.value[index] = updatedItem;
+    }
+
+    return true;
+  } catch (error) {
+    saveError.value = error.message;
+    return false;
+  } finally {
+    isSaving.value = false;
+  }
+}
+ return {
   items,
   errorMessage,
   isLoading,
@@ -67,5 +117,7 @@ export const useItemStore = defineStore("items", () => {
   isSaving,
   saveError,
   addItem,
+  getItemById,
+  updateItem,
 };
 });

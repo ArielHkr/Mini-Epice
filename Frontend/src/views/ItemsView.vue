@@ -88,6 +88,7 @@ onMounted(loadItems);
                 <th scope="col">Name</th>
                 <th scope="col" class="text-center">Quantity</th>
                 <th scope="col" class="text-right">Unit price</th>
+                <th scope="col" class="actions-column">Actions</th>
               </tr>
             </thead>
 
@@ -114,6 +115,12 @@ onMounted(loadItems);
                 <td class="item-price">
                   {{ formatPrice(item.unitPrice) }}
                 </td>
+                <td class="actions-column">
+  <RouterLink :to="`/items/${item.id}/edit`" class="edit-link">
+    Edit
+    
+  </RouterLink>
+</td>
               </tr>
             </tbody>
           </table>

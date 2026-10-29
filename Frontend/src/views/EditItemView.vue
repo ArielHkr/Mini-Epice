@@ -95,9 +95,13 @@
               </p>
             </div>
 
-            <button type="submit" class="save-button">
-              {{ isSaving ? "Saving..." : "Save changes" }}
-            </button>
+            <button
+           type="submit"
+           class="save-button"
+        :disabled="isSaving || !hasChanges"
+         >
+        {{ isSaving ? "Saving..." : "Save changes" }}
+           </button>
           </fieldset>
 
           <p v-if="saveError" role="alert" class="error-message">
@@ -110,12 +114,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import { useItemStore } from "../stores/itemStore.mjs";
-
 const route = useRoute();
 const router = useRouter();
 const itemStore = useItemStore();
@@ -134,7 +137,17 @@ const errors = ref({
   quantity: "",
   unitPrice: "",
 });
+const originalItem = ref(null);
 
+const hasChanges = computed(() => {
+  if (!originalItem.value) return false;
+
+  return (
+    name.value.trim() !== originalItem.value.name ||
+    quantity.value !== originalItem.value.quantity ||
+    unitPrice.value !== originalItem.value.unitPrice
+  );
+});
 function validateForm() {
   errors.value = {
     name: "",
@@ -168,6 +181,12 @@ async function loadItem() {
     name.value = item.name;
     quantity.value = Number(item.quantity);
     unitPrice.value = Number(item.unitPrice);
+
+    originalItem.value = {
+      name: name.value.trim(),
+      quantity: quantity.value,
+      unitPrice: unitPrice.value,
+    };
   } catch (error) {
     loadError.value = error.message;
   } finally {
@@ -176,7 +195,7 @@ async function loadItem() {
 }
 
 async function submitItem() {
-  if (isSaving.value) return;
+ if (isSaving.value || !hasChanges.value) return;
 
   itemStore.saveError = "";
 

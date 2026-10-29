@@ -44,3 +44,13 @@ export async function updateItem(id, { name, quantity, unitPrice }) {
 
   return rows[0] ?? null;
 }
+export async function deleteItem(id) {
+  const { rows } = await db.query(
+    `DELETE FROM items
+     WHERE id = $1
+     RETURNING id`,
+    [id]
+  );
+
+  return rows[0] ?? null;
+}

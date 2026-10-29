@@ -9,6 +9,8 @@ export const useItemStore = defineStore("items", () => {
   const isLoading = ref(false);
   const isSaving = ref(false);
   const saveError = ref("");
+  const deletingId = ref(null);
+  const deleteError = ref("");
 
   async function addItem(item) {
   if (isSaving.value) return false;
@@ -109,6 +111,34 @@ async function updateItem(id, item) {
     isSaving.value = false;
   }
 }
+
+async function deleteItem(id) {
+  if (deletingId.value !== null) return false;
+
+  const itemId = Number(id);
+
+  deletingId.value = itemId;
+  deleteError.value = "";
+
+  try {
+    const response = await fetch(`${Url}/items/${itemId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to delete the item.");
+    }
+
+    items.value = items.value.filter((item) => item.id !== itemId);
+
+    return true;
+  } catch (error) {
+    deleteError.value = error.message;
+    return false;
+  } finally {
+    deletingId.value = null;
+  }
+}
  return {
   items,
   errorMessage,
@@ -119,5 +149,8 @@ async function updateItem(id, item) {
   addItem,
   getItemById,
   updateItem,
+  deletingId,
+  deleteError,
+  deleteItem,
 };
 });

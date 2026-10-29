@@ -1,5 +1,3 @@
-
-
 <template>
   <main class="page">
     <div class="form-container">
@@ -15,14 +13,14 @@
         </p>
       </header>
 
-      <form class="item-form" @submit.prevent="submitItem">
+      <form class="item-form" novalidate @submit.prevent="submitItem">
         <fieldset :disabled="isSaving" class="form-fieldset">
           <legend class="form-title">Item information</legend>
 
           <div class="form-content">
             <div class="form-group">
               <label for="name">
-                Name <span class="required">*</span>
+                Name <span class="required" aria-hidden="true">*</span>
               </label>
 
               <input
@@ -31,40 +29,77 @@
                 type="text"
                 placeholder="e.g. Rice, Sugar, Flour..."
                 autocomplete="off"
-                required
+                aria-required="true"
+                :class="{ 'input-error': errors.name }"
+                :aria-invalid="Boolean(errors.name)"
+                :aria-describedby="errors.name ? 'name-error' : undefined"
+                @input="errors.name = ''"
               />
+
+              <p
+                v-if="errors.name"
+                id="name-error"
+                class="field-error"
+                role="alert"
+              >
+                {{ errors.name }}
+              </p>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label for="quantity">
-                  Quantity <span class="required">*</span>
+                  Quantity <span class="required" aria-hidden="true">*</span>
                 </label>
 
                 <input
                   id="quantity"
                   v-model.number="quantity"
                   type="number"
-                  min="1"
                   step="any"
-                  required
+                  aria-required="true"
+                  :class="{ 'input-error': errors.quantity }"
+                  :aria-invalid="Boolean(errors.quantity)"
+                  :aria-describedby="errors.quantity ? 'quantity-error' : undefined"
+                  @input="errors.quantity = ''"
                 />
+
+                <p
+                  v-if="errors.quantity"
+                  id="quantity-error"
+                  class="field-error"
+                  role="alert"
+                >
+                  {{ errors.quantity }}
+                </p>
               </div>
 
               <div class="form-group">
                 <label for="unit-price">
-                  Unit price <span class="required">*</span>
+                  Unit price <span class="required" aria-hidden="true">*</span>
                 </label>
 
                 <input
                   id="unit-price"
                   v-model.number="unitPrice"
                   type="number"
-                  min="0.01"
-                  step="0.01"
+                  step="any"
                   placeholder="0.00"
-                  required
+                  aria-required="true"
+                  :class="{ 'input-error': errors.unitPrice }"
+                  :aria-invalid="Boolean(errors.unitPrice)"
+                  :aria-describedby="errors.unitPrice ? 'price-error' : undefined"
+                  @input="errors.unitPrice = ''"
                 />
+
+                <p
+                  v-if="errors.unitPrice"
+                  id="price-error"
+                  class="field-error"
+                  role="alert"
+                >
+                  {{ errors.unitPrice }}
+                </p>
               </div>
             </div>
 
@@ -88,13 +123,10 @@
   </main>
 </template>
 
-<style scoped src="../assets/styles/addItem.css"></style>
-
-
 <script setup>
 import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import { useItemStore } from "../stores/itemStore.mjs";
 
@@ -107,7 +139,45 @@ const name = ref("");
 const quantity = ref(1);
 const unitPrice = ref("");
 
+const errors = ref({
+  name: "",
+  quantity: "",
+  unitPrice: "",
+});
+
+function validateForm() {
+  errors.value = {
+    name: "",
+    quantity: "",
+    unitPrice: "",
+  };
+
+  if (name.value.trim() === "") {
+    errors.value.name = "Name must not be empty.";
+  }
+
+  if (!Number.isFinite(quantity.value) || quantity.value < 1) {
+    errors.value.quantity = "Quantity must be a number greater than or equal to 1.";
+  }
+
+  if (!Number.isFinite(unitPrice.value) || unitPrice.value <= 0) {
+    errors.value.unitPrice = "Unit price must be a number greater than 0.";
+  }
+
+  return (
+    errors.value.name === "" &&
+    errors.value.quantity === "" &&
+    errors.value.unitPrice === ""
+  );
+}
+
 async function submitItem() {
+  if (isSaving.value) return;
+
+  itemStore.saveError = "";
+
+  if (!validateForm()) return;
+
   const success = await itemStore.addItem({
     name: name.value,
     quantity: quantity.value,
@@ -128,3 +198,5 @@ onMounted(() => {
   itemStore.saveError = "";
 });
 </script>
+
+<style scoped src="../assets/styles/addItem.css"></style>

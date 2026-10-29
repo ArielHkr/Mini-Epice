@@ -7,5 +7,5 @@ const router = Router();
 router.get("/", itemController.getAllItems);
 router.get("/:id", itemController.getItemById);
 router.post("/", validateItem, itemController.addItem);
-router.("/:id", validateItemId ,validateItem, itemController.updateItem);
+router.put("/:id", validateItemId ,validateItem, itemController.updateItem);
 export default router;

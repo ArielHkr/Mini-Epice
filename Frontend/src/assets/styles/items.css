@@ -110,6 +110,16 @@
 .items-table td {
   @apply px-4 py-3;
 }
+.actions-column {
+  @apply text-right;
+}
+
+.edit-link {
+  @apply inline-block rounded-lg bg-emerald-50 px-3 py-2 text-sm
+         font-semibold text-emerald-700 transition-colors
+         hover:bg-emerald-100 focus-visible:outline-2
+         focus-visible:outline-offset-2 focus-visible:outline-emerald-700;
+}
 
 /* =========================
     ITEMS DATA

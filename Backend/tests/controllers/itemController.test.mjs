@@ -1,11 +1,11 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import { addItem, updateItem } from "../../controllers/itemController.mjs";
+import { addItem, updateItem,deleteItem } from "../../controllers/itemController.mjs";
 import * as itemModel from "../../models/itemModel.mjs";
 
 vi.mock("../../models/itemModel.mjs", () => ({
   createItem: vi.fn(),
   updateItem: vi.fn(),
-
+ deleteItem: vi.fn(),
 }));
 
 describe("addItem", () => {
@@ -137,6 +137,69 @@ describe("updateItem", () => {
 
     expect(next).toHaveBeenCalledExactlyOnceWith(error);
     expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+  });
+});
+
+describe("deleteItem", () => {
+  let req;
+  let res;
+  let next;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+
+    req = {
+      params: { id: "1" },
+    };
+
+    res = {
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn(),
+      json: vi.fn(),
+    };
+
+    next = vi.fn();
+  });
+
+  it("returns status 204 when the item is deleted", async () => {
+    itemModel.deleteItem.mockResolvedValue({ id: 1 });
+
+    await deleteItem(req, res, next);
+
+    expect(itemModel.deleteItem).toHaveBeenCalledExactlyOnceWith(1);
+    expect(res.status).toHaveBeenCalledWith(204);
+    expect(res.send).toHaveBeenCalledExactlyOnceWith();
+    expect(res.json).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("passes a 404 error when the item does not exist", async () => {
+    itemModel.deleteItem.mockResolvedValue(null);
+
+    await deleteItem(req, res, next);
+
+    expect(next).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        status: 404,
+        message: "Item not found.",
+      }),
+    );
+
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.send).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+  });
+
+  it("passes a model error to the error middleware", async () => {
+    const error = new Error("Database unavailable.");
+    itemModel.deleteItem.mockRejectedValue(error);
+
+    await deleteItem(req, res, next);
+
+    expect(next).toHaveBeenCalledExactlyOnceWith(error);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.send).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
   });
 });

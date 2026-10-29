@@ -79,3 +79,7 @@
 .form-field input.input-error:focus {
   outline-color: #dc2626;
 }
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

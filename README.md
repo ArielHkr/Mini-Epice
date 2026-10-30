@@ -1,7 +1,8 @@
 # Mini-Épice — guide de démarrage
 
 Mini-Épice est une application Vue et Express avec une base PostgreSQL. Docker démarre l'application et la base ; seul le port **3000** est utilisé sur l'ordinateur. Vue et l'API sont accessibles à partir de `http://localhost:3000`.
-
+## 0 Temps accordé pour les tests 
+Temps estimé consacré aux tests : 4-6 heures environs. Les tests ont porté sur les fonctionnalités du frontend, les routes de l'API, les opérations sur la base PostgreSQL, l'authentification et le fonctionnement de l'application dans Docker. Plusieurs problèmes de configuration et d'intégration ont également été corrigés.
 ## 1. Préparer l'ordinateur
 
 Installer et démarrer [Docker Desktop](https://www.docker.com/products/docker-desktop/). Attendre que le moteur Docker soit prêt. Git est utile pour cloner le projet ; il est aussi possible de télécharger l'archive ZIP du dépôt et de l'extraire. Il n'est pas nécessaire d'installer Node.js ou PostgreSQL.

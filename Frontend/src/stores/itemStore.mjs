@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-
+import { useAuthStore } from "./authStore.mjs";
 
 const Url ="http://localhost:3000/api"
 export const useItemStore = defineStore("items", () => {
@@ -11,7 +11,7 @@ export const useItemStore = defineStore("items", () => {
   const saveError = ref("");
   const deletingId = ref(null);
   const deleteError = ref("");
-
+  const authStore = useAuthStore();
   async function addItem(item) {
   if (isSaving.value) return false;
 
@@ -23,6 +23,7 @@ export const useItemStore = defineStore("items", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+         Authorization: `Bearer ${authStore.token}`,
       },
       body: JSON.stringify(item),
     });
@@ -85,6 +86,8 @@ async function updateItem(id, item) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+          Authorization: `Bearer ${authStore.token}`,
+
       },
       body: JSON.stringify(item),
     });
@@ -123,6 +126,9 @@ async function deleteItem(id) {
   try {
     const response = await fetch(`${Url}/items/${itemId}`, {
       method: "DELETE",
+      headers: {
+    Authorization: `Bearer ${authStore.token}`,
+  },
     });
 
     if (!response.ok) {

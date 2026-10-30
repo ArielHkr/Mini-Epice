@@ -1,0 +1,59 @@
+.error-page {
+  min-height: 75vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  background: #f8fafc;
+}
+
+.error-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 520px;
+  padding: 3rem 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 6%);
+}
+
+.error-code {
+  margin: 0;
+  color: #047857;
+  font-size: clamp(4rem, 15vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.error-card h1 {
+  margin: 1.5rem 0 0.75rem;
+  color: #0f172a;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.error-description {
+  margin: 0 0 2rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.error-button {
+  display: inline-block;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.65rem;
+  background: #047857;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.error-button:hover {
+  background: #065f46;
+}
+
+.error-button:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 4px;
+}

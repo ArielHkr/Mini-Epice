@@ -33,6 +33,10 @@ const router = createRouter({
     path: "/login",
     component: LoginView,
     },
+    {
+  path: "/items/:id/edit",
+  component: EditItemView,
+},
   ],
 });
 
